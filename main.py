@@ -1,36 +1,115 @@
-# We should install pandas and tcrdist3 packages for our python environment first
 import pandas as pd
 from tcrdist.repertoire import TCRrep
 
+
+# Task 3 (the following part of code is finished by Letian Zhang).
+
 # read the dataset
-df = pd.read_csv("vdjdb.csv", sep = ",")
+df = pd.read_csv(r"vdjdb.csv", sep = ",", usecols=(0,1,2,3,4,5,9,10,16))
 
-# search TRA data and rename some columns
-df_alpha = df[df["gene"] == "TRA"]
-df_alpha = df_alpha.rename(columns = {'v.segm':'v_a_gene', 'j.segm':'j_a_gene'})
+# remove vdjdb.score = 0
+df1 = df[ df['vdjdb.score'] != 0]
 
-# search TRB data and rename some columns
-df_beta = df[df["gene"] == "TRB"]
-df_beta = df_beta.rename(columns = {'v.segm':'v_b_gene', 'j.segm':'j_b_gene'})
+# rename some columns for df1
+df1 = df1.rename(columns = {'complex.id':'clone_id',
+                            'species':'subject',
+                            'antigen.gene':'epitope',
+                            'vdjdb.score':'count'})
 
-# use method in tcrdist3 package to set parameter for alpha chain.
-tr_alpha = TCRrep(cell_df = df_alpha,
-            organism='human',
-            chains = ['alpha'],
-            infer_all_genes = True,
-            compute_distances = True,
-            deduplicate=False,
-            db_file = 'alphabeta_gammadelta_db.tsv')
+# alpha chain
+df1_alpha = df1[ df1['gene'] == 'TRA']
+df1_alpha = df1_alpha.dropna(axis=0, how='any')
 
-# use method in tcrdist3 package to set parameter for beta chain.
-tr_beta = TCRrep(cell_df = df_beta,
-            organism='human',
-            chains = ['beta'],
-            infer_all_genes = True,
-            compute_distances = True,
-            deduplicate=False,
-            db_file = 'alphabeta_gammadelta_db.tsv')
+# beta chain
+df1_beta = df1[ df1['gene'] == 'TRB']
+df1_beta = df1_beta.dropna(axis=0, how='any')
 
-# use default method in tcrdist3 package to calculate the distance
-tr_alpha.pw_alpha
-tr_beta.pw_beta
+# rename some columns for df1_alpha and df1_beta
+df1_alpha = df1_alpha.rename(columns = {'v.segm':'v_a_gene',
+                                        'j.segm':'j_a_gene',
+                                        'cdr3':'cdr3_a_aa'})
+df1_beta = df1_beta.rename(columns = {'v.segm':'v_b_gene',
+                                      'j.segm':'j_b_gene',
+                                      'cdr3':'cdr3_b_aa'})
+
+# remove the column 'gene'
+df1_alpha = df1_alpha.drop(['gene'], axis=1)
+df1_beta = df1_beta.drop(['gene'], axis=1)
+
+# remove clone_id = 0
+df1_alpha = df1_alpha[ df1_alpha['clone_id'] != 0]
+df1_beta = df1_beta[ df1_beta['clone_id'] != 0]
+
+# inner connect two dataframe
+df1 = pd.merge(df1_alpha, df1_beta)
+
+# for all the alpha chains
+# compute the distance matrix for the alpha chains (mouse)
+tr_mouse_a = TCRrep(cell_df = df1_alpha,
+                    organism = 'mouse',
+                    chains = ['alpha'],
+                    db_file = 'alphabeta_gammadelta_db.tsv')
+tr_mouse_alpha = tr_mouse_a.pw_alpha
+print(tr_mouse_alpha)
+#print(tr_mouse_a.pw_cdr3_a_aa)
+
+# compute the distance matrix for the alpha chains (human)
+tr_human_a = TCRrep(cell_df = df1_alpha,
+                    organism = 'human',
+                    chains = ['alpha'],
+                    db_file = 'alphabeta_gammadelta_db.tsv')
+tr_human_alpha = tr_human_a.pw_alpha
+print(tr_human_alpha)
+#print(tr_mouse_a.pw_cdr3_a_aa)
+
+# for all the beta chains
+# compute the distance matrix for the beta chains (mouse)
+tr_mouse_b = TCRrep(cell_df = df1_beta,
+                    organism = 'mouse',
+                    chains = ['beta'],
+                    db_file = 'alphabeta_gammadelta_db.tsv')
+tr_mouse_beta = tr_mouse_b.pw_beta
+print(tr_mouse_beta)
+#print(tr_mouse_b.pw_cdr3_b_aa)
+
+# compute the distance matrix for the beta chains (human)
+tr_human_b = TCRrep(cell_df = df1_beta,
+                    organism = 'human',
+                    chains = ['beta'],
+                    db_file = 'alphabeta_gammadelta_db.tsv')
+tr_human_beta = tr_human_b.pw_beta
+print(tr_human_beta)
+#print(tr_human_b.pw_cdr3_b_aa)
+
+# only for alpha and beta chains that can be paired
+# compute the distance matrix for the alpha and the beta chains (mouse)
+tr_mouse = TCRrep(cell_df = df1,
+                  organism = 'mouse',
+                  chains = ['alpha','beta'],
+                  db_file = 'alphabeta_gammadelta_db.tsv')
+tr_mouse_alpha = tr_mouse.pw_alpha
+print(tr_mouse_alpha)
+tr_mouse_beta = tr_mouse.pw_beta
+print(tr_mouse_beta)
+#print(tr_mouse.pw_cdr3_a_aa)
+#print(tr_mouse.pw_cdr3_b_aa)
+tr_mouse_alpha_beta = tr_mouse.pw_alpha + tr_mouse.pw_beta
+print(tr_mouse_alpha_beta)
+
+# compute the distance matrix for the alpha and the beta chains (human)
+tr_human = TCRrep(cell_df = df1,
+                  organism = 'human',
+                  chains = ['alpha','beta'],
+                  db_file = 'alphabeta_gammadelta_db.tsv')
+tr_human_alpha = tr_human.pw_alpha
+print(tr_human_alpha)
+tr_human_beta = tr_human.pw_beta
+print(tr_human_beta)
+#print(tr_human.pw_cdr3_a_aa)
+#print(tr_human.pw_cdr3_b_aa)
+tr_human_alpha_beta = tr_human.pw_alpha + tr_human.pw_beta
+print(tr_human_alpha_beta)
+
+
+# Task 4 (the following part of code is finished by Uchit Bhadauriya).
+
