@@ -36,13 +36,6 @@ df1_beta = df1_beta.rename(columns = {'v.segm':'v_b_gene',
 df1_alpha = df1_alpha.drop(['gene'], axis=1)
 df1_beta = df1_beta.drop(['gene'], axis=1)
 
-# remove clone_id = 0
-df1_alpha = df1_alpha[ df1_alpha['clone_id'] != 0]
-df1_beta = df1_beta[ df1_beta['clone_id'] != 0]
-
-# inner connect two dataframe
-df1 = pd.merge(df1_alpha, df1_beta)
-
 # for all the alpha chains
 # compute the distance matrix for the alpha chains (mouse)
 tr_mouse_a = TCRrep(cell_df = df1_alpha,
@@ -80,6 +73,13 @@ tr_human_b = TCRrep(cell_df = df1_beta,
 tr_human_beta = tr_human_b.pw_beta
 print(tr_human_beta)
 #print(tr_human_b.pw_cdr3_b_aa)
+
+# remove clone_id = 0
+df1_alpha = df1_alpha[ df1_alpha['clone_id'] != 0]
+df1_beta = df1_beta[ df1_beta['clone_id'] != 0]
+
+# inner connect two dataframe
+df1 = pd.merge(df1_alpha, df1_beta)
 
 # only for alpha and beta chains that can be paired
 # compute the distance matrix for the alpha and the beta chains (mouse)
