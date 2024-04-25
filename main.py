@@ -90,12 +90,13 @@ tr_mouse = TCRrep(cell_df = df1,
                   organism = 'mouse',
                   chains = ['alpha','beta'],
                   db_file = 'alphabeta_gammadelta_db.tsv')
-tr_mouse_alpha = tr_mouse.pw_alpha
+tr_mouse_alpha1 = tr_mouse.pw_alpha
 print(tr_mouse_alpha)
-tr_mouse_beta = tr_mouse.pw_beta
+tr_mouse_beta1 = tr_mouse.pw_beta
 print(tr_mouse_beta)
 #print(tr_mouse.pw_cdr3_a_aa)
 #print(tr_mouse.pw_cdr3_b_aa)
+tr_mouse_alpha_beta_color = tr_mouse.clone_df
 tr_mouse_alpha_beta = tr_mouse.pw_alpha + tr_mouse.pw_beta
 print(tr_mouse_alpha_beta)
 
@@ -105,12 +106,13 @@ tr_human = TCRrep(cell_df = df1,
                   organism = 'human',
                   chains = ['alpha','beta'],
                   db_file = 'alphabeta_gammadelta_db.tsv')
-tr_human_alpha = tr_human.pw_alpha
+tr_human_alpha1 = tr_human.pw_alpha
 print(tr_human_alpha)
-tr_human_beta = tr_human.pw_beta
+tr_human_beta1 = tr_human.pw_beta
 print(tr_human_beta)
 #print(tr_human.pw_cdr3_a_aa)
 #print(tr_human.pw_cdr3_b_aa)
+tr_human_alpha_beta_color = tr_human.clone_df
 tr_human_alpha_beta = tr_human.pw_alpha + tr_human.pw_beta
 print(tr_human_alpha_beta)
 
@@ -126,7 +128,69 @@ tr_human_alpha_beta_df.to_csv('tr_human_alpha_beta.csv', index = False)
 print("Matrix saved as 'tr_human_alpha_beta.csv'")
 
 
-# Task 4 (the following part of code is finished by Uchit Bhadauriya).
 
-#I uploaded my code as a separate file like "Task 4".
 
+# Task 4
+
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from umap import UMAP
+
+def plot_dimensionality_reduction(X, labels, method, title):
+    """
+    Helper function to plot dimensionality reduced data.
+    Plots data with colors representing different labels.
+    """
+    plt.figure(figsize=(10, 8))
+    scatter = plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', alpha=0.6)
+    plt.colorbar(scatter)
+    plt.title(f'{method} for {title}')
+    plt.grid(True)
+    plt.show()
+
+def process_tcr_distances(distance_matrix, labels, title):
+    """
+    Processes the distance matrix using PCA, t-SNE, and UMAP and plots the results.
+    """
+    X = distance_matrix
+
+    # PCA
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+    plot_dimensionality_reduction(X_pca, labels, "PCA", title)
+
+    # t-SNE
+    tsne = TSNE(n_components=2)
+    X_tsne = tsne.fit_transform(X)
+    plot_dimensionality_reduction(X_tsne, labels, "t-SNE", title)
+
+    # UMAP
+    umap = UMAP(n_components=2)
+    X_umap = umap.fit_transform(X)
+    plot_dimensionality_reduction(X_umap, labels, "UMAP", title)
+
+# mouse
+# Convert 'epitope' labels to categorical numeric codes
+labels_numeric = pd.Categorical(df1['epitope']).codes
+
+# Convert 'epitope' labels to categorical numeric codes for coloring
+tr_mouse_alpha_color['epitope_codes'] = pd.Categorical(tr_mouse_alpha_color['epitope']).codes
+tr_mouse_beta_color['epitope_codes'] = pd.Categorical(tr_mouse_beta_color['epitope']).codes
+tr_mouse_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_mouse_alpha_beta_color['epitope']).codes
+
+# Process distances and plot with the numeric labels
+process_tcr_distances(tr_mouse_alpha, tr_mouse_alpha_color['epitope_codes'], "Mouse Alpha Chain")
+process_tcr_distances(tr_mouse_beta, tr_mouse_beta_color['epitope_codes'], "Mouse Beta Chain")
+process_tcr_distances(tr_mouse_alpha_beta, tr_mouse_alpha_beta_color['epitope_codes'], "Mouse Combined Alpha-Beta Chain")
+
+# human
+# Convert 'epitope' labels to categorical numeric codes for coloring
+tr_human_alpha_color['epitope_codes'] = pd.Categorical(tr_human_alpha_color['epitope']).codes
+tr_human_beta_color['epitope_codes'] = pd.Categorical(tr_human_beta_color['epitope']).codes
+tr_human_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
+
+# Process distances and plot with the numeric labels
+process_tcr_distances(tr_human_alpha, tr_human_alpha_color['epitope_codes'], "Human Alpha Chain")
+process_tcr_distances(tr_human_beta, tr_human_beta_color['epitope_codes'], "Human Beta Chain")
+process_tcr_distances(tr_human_alpha_beta, tr_human_alpha_beta_color['epitope_codes'], "Human Combined Alpha-Beta Chain")
