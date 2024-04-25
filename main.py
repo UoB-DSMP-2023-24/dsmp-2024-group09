@@ -190,6 +190,57 @@ tr_human_alpha_color['epitope_codes'] = pd.Categorical(tr_human_alpha_color['epi
 tr_human_beta_color['epitope_codes'] = pd.Categorical(tr_human_beta_color['epitope']).codes
 tr_human_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
 
+
+
+# task 6
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import accuracy_score, recall_score, f1_score, classification_report
+
+# 函数定义：执行网格搜索
+def optimize_knn_parameters(X, y):
+    knn = KNeighborsClassifier(metric='precomputed', algorithm='brute')
+    param_grid = {
+        'n_neighbors': [2, 3, 5, 7, 10, 12, 15], # 不同的邻居数
+        'weights': ['uniform', 'distance'], # 邻居的权重策略
+        }
+    grid_search = GridSearchCV(knn, param_grid, cv=4, scoring='accuracy')
+    grid_search.fit(X, y)
+    return grid_search.best_estimator_, grid_search.best_params_
+
+
+# 函数定义：划分训练和测试数据并执行模型优化
+def perform_analysis(X, labels):
+    indices = np.arange(len(labels))
+    train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=1)
+    X_train = X[np.ix_(train_indices, train_indices)]
+    X_test = X[np.ix_(test_indices, train_indices)]
+    y_train = labels[train_indices]
+    y_test = labels[test_indices]
+    best_knn, best_params = optimize_knn_parameters(X_train, y_train)
+    print(f'Best parameters: {best_params}')
+    y_pred = best_knn.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred, average='macro')
+    f1 = f1_score(y_test, y_pred, average='macro')
+    report = classification_report(y_test, y_pred)
+    return accuracy, recall, f1, report
+
+# 获取标签数据并执行分析
+labels = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
+accuracy_human, recall_human, f1_human, report_human = perform_analysis(tr_human_alpha_beta, labels)
+print(f'Accuracy-human: {accuracy_human:.2f}')
+print(f'Recall-human: {recall_human:.2f}')
+print(f'F1 Score-human: {f1_human:.2f}')
+print("Classification Report-human:\n", report_human)
+
+labels1 = pd.Categorical(tr_mouse_alpha_beta_color['epitope']).codes
+accuracy_mouse, recall_mouse, f1_mouse, report_mouse = perform_analysis(tr_mouse_alpha_beta, labels1)
+print(f'Accuracy-mouse: {accuracy_mouse:.2f}')
+print(f'Recall-mouse: {recall_mouse:.2f}')
+print(f'F1 Score-mouse: {f1_mouse:.2f}')
+print("Classification Report-mouse:\n", report_mouse)
 # Process distances and plot with the numeric labels
 process_tcr_distances(tr_human_alpha, tr_human_alpha_color['epitope_codes'], "Human Alpha Chain")
 process_tcr_distances(tr_human_beta, tr_human_beta_color['epitope_codes'], "Human Beta Chain")
