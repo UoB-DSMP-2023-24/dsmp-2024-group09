@@ -1,7 +1,6 @@
 import pandas as pd
 from tcrdist.repertoire import TCRrep
 
-
 # Task 3 (the following part of code is finished by Letian Zhang).
 
 # read the dataset
@@ -9,12 +8,12 @@ df = pd.read_csv(r"vdjdb.csv", sep = ",", usecols=(0,1,2,3,4,5,9,10,16))
 
 # remove vdjdb.score = 0
 df1 = df[ df['vdjdb.score'] != 0]
+# df1 = df1[ df1['vdjdb.score'] != 1]
 
 # rename some columns for df1
 df1 = df1.rename(columns = {'complex.id':'clone_id',
                             'species':'subject',
-                            'antigen.gene':'epitope',
-                            'vdjdb.score':'count'})
+                            'antigen.gene':'epitope'})
 
 # alpha chain
 df1_alpha = df1[ df1['gene'] == 'TRA']
@@ -96,6 +95,7 @@ print(tr_mouse_beta)
 tr_mouse_alpha_beta = tr_mouse.pw_alpha + tr_mouse.pw_beta
 print(tr_mouse_alpha_beta)
 
+
 # compute the distance matrix for the alpha and the beta chains (human)
 tr_human = TCRrep(cell_df = df1,
                   organism = 'human',
@@ -109,6 +109,17 @@ print(tr_human_beta)
 #print(tr_human.pw_cdr3_b_aa)
 tr_human_alpha_beta = tr_human.pw_alpha + tr_human.pw_beta
 print(tr_human_alpha_beta)
+
+
+# transfer matrix to csv file
+
+tr_mouse_alpha_beta_df = pd.DataFrame(tr_mouse_alpha_beta)
+tr_mouse_alpha_beta_df.to_csv('tr_mouse_alpha_beta.csv', index = False)
+print("Matrix saved as 'tr_mouse_alpha_beta.csv'")
+
+tr_human_alpha_beta_df = pd.DataFrame(tr_human_alpha_beta)
+tr_human_alpha_beta_df.to_csv('tr_human_alpha_beta.csv', index = False)
+print("Matrix saved as 'tr_human_alpha_beta.csv'")
 
 
 # Task 4 (the following part of code is finished by Uchit Bhadauriya).
