@@ -42,6 +42,7 @@ tr_mouse_a = TCRrep(cell_df = df1_alpha,
                     chains = ['alpha'],
                     db_file = 'alphabeta_gammadelta_db.tsv')
 tr_mouse_alpha = tr_mouse_a.pw_alpha
+tr_mouse_alpha_color = tr_mouse_a.clone_df
 print(tr_mouse_alpha)
 #print(tr_mouse_a.pw_cdr3_a_aa)
 
@@ -51,6 +52,7 @@ tr_human_a = TCRrep(cell_df = df1_alpha,
                     chains = ['alpha'],
                     db_file = 'alphabeta_gammadelta_db.tsv')
 tr_human_alpha = tr_human_a.pw_alpha
+tr_human_alpha_color = tr_human_a.clone_df
 print(tr_human_alpha)
 #print(tr_mouse_a.pw_cdr3_a_aa)
 
@@ -61,6 +63,7 @@ tr_mouse_b = TCRrep(cell_df = df1_beta,
                     chains = ['beta'],
                     db_file = 'alphabeta_gammadelta_db.tsv')
 tr_mouse_beta = tr_mouse_b.pw_beta
+tr_mouse_beta_color = tr_mouse_b.clone_df
 print(tr_mouse_beta)
 #print(tr_mouse_b.pw_cdr3_b_aa)
 
@@ -70,6 +73,7 @@ tr_human_b = TCRrep(cell_df = df1_beta,
                     chains = ['beta'],
                     db_file = 'alphabeta_gammadelta_db.tsv')
 tr_human_beta = tr_human_b.pw_beta
+tr_human_beta_color = tr_human_b.clone_df
 print(tr_human_beta)
 #print(tr_human_b.pw_cdr3_b_aa)
 
