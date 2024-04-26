@@ -128,63 +128,187 @@ print("Matrix saved as 'tr_human_alpha_beta.csv'")
 # Task 4 (the following part of code is finished by Uchit Bhadauriya).
 
 
+#Task4
+
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
+import seaborn as sns
 from umap import UMAP
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
-def plot_dimensionality_reduction(X, labels, method, title):
-    """
-    Helper function to plot dimensionality reduced data.
-    Plots data with colors representing different labels.
-    """
-    plt.figure(figsize=(10, 8))
-    scatter = plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', alpha=0.6)
-    plt.colorbar(scatter)
-    plt.title(f'{method} for {title}')
-    plt.grid(True)
-    plt.show()
+# Mouse
 
-def process_tcr_distances(distance_matrix, labels, title):
-    """
-    Processes the distance matrix using PCA, t-SNE, and UMAP and plots the results.
-    """
-    X = distance_matrix
+##alpha chains
 
-    # PCA
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-    plot_dimensionality_reduction(X_pca, labels, "PCA", title)
+# Scale the data
+scaler = StandardScaler()
+tr_mouse_alpha_scaled = scaler.fit_transform(tr_mouse_alpha)
 
-    # t-SNE
-    tsne = TSNE(n_components=2)
-    X_tsne = tsne.fit_transform(X)
-    plot_dimensionality_reduction(X_tsne, labels, "t-SNE", title)
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding_alpha = reducer.fit_transform(tr_mouse_alpha_scaled)
 
-    # UMAP
-    umap = UMAP(n_components=2)
-    X_umap = umap.fit_transform(X)
-    plot_dimensionality_reduction(X_umap, labels, "UMAP", title)
+# Create a DataFrame for the embedding
+embedding_alpha_df = pd.DataFrame(embedding_alpha, columns=['UMAP-1', 'UMAP-2'])
+embedding_alpha_df['antigen.epitope'] = tr_mouse_alpha_color['antigen.epitope']
 
-# mouse
-# Convert 'epitope' labels to categorical numeric codes
-labels_numeric = pd.Categorical(df1['epitope']).codes
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_alpha_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
 
-# Convert 'epitope' labels to categorical numeric codes for coloring
-tr_mouse_alpha_color['epitope_codes'] = pd.Categorical(tr_mouse_alpha_color['epitope']).codes
-tr_mouse_beta_color['epitope_codes'] = pd.Categorical(tr_mouse_beta_color['epitope']).codes
-tr_mouse_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_mouse_alpha_beta_color['epitope']).codes
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-# Process distances and plot with the numeric labels
-process_tcr_distances(tr_mouse_alpha, tr_mouse_alpha_color['epitope_codes'], "Mouse Alpha Chain")
-process_tcr_distances(tr_mouse_beta, tr_mouse_beta_color['epitope_codes'], "Mouse Beta Chain")
-process_tcr_distances(tr_mouse_alpha_beta, tr_mouse_alpha_beta_color['epitope_codes'], "Mouse Combined Alpha-Beta Chain")
+plt.title('UMAP: Data Visualization by Antigen Epitope - Mouse Alpha Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
 
-# human
-# Convert 'epitope' labels to categorical numeric codes for coloring
-tr_human_alpha_color['epitope_codes'] = pd.Categorical(tr_human_alpha_color['epitope']).codes
-tr_human_beta_color['epitope_codes'] = pd.Categorical(tr_human_beta_color['epitope']).codes
-tr_human_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
+
+##beta chains
+
+
+# Scale the data
+scaler = StandardScaler()
+tr_mouse_beta_scaled = scaler.fit_transform(tr_mouse_beta)
+
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding_beta = reducer.fit_transform(tr_mouse_beta_scaled)
+
+# Create a DataFrame for the embedding
+embedding_beta_df = pd.DataFrame(embedding_beta, columns=['UMAP-1', 'UMAP-2'])
+embedding_beta_df['antigen.epitope'] = tr_mouse_alpha_beta_color['antigen.epitope']
+
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+plt.title('UMAP: Data Visualization by Antigen Epitope - Mouse Beta Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
+
+##alpha+beta chains
+
+# Scale the data
+scaler = StandardScaler()
+tr_mouse_scaled = scaler.fit_transform(tr_mouse_alpha_beta)
+
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding = reducer.fit_transform(tr_mouse_scaled)
+
+# Create a DataFrame for the embedding
+embedding_df = pd.DataFrame(embedding, columns=['UMAP-1', 'UMAP-2'])
+embedding_df['antigen.epitope'] = tr_mouse_alpha_beta_color['antigen.epitope']
+
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+plt.title('UMAP: Data Visualization by Antigen Epitope - Mouse Alpha+Beta Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
+
+#Human
+
+##alpha chains
+
+# Scale the data
+scaler = StandardScaler()
+tr_human_alpha_scaled = scaler.fit_transform(tr_human_alpha)
+
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding_human_alpha = reducer.fit_transform(tr_human_alpha_scaled)
+
+# Create a DataFrame for the embedding
+embedding_human_alpha_df = pd.DataFrame(embedding_human_alpha, columns=['UMAP-1', 'UMAP-2'])
+embedding_human_alpha_df['antigen.epitope'] = tr_human_alpha_color['antigen.epitope']
+
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_human_alpha_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+plt.title('UMAP: Data Visualization by Antigen Epitope - Human Alpha Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
+
+##beta chains
+
+# Scale the data
+scaler = StandardScaler()
+tr_mouse_human_beta_scaled = scaler.fit_transform(tr_human_alpha_beta)
+
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding_human_beta = reducer.fit_transform(tr_mouse_human_beta_scaled)
+
+# Create a DataFrame for the embedding
+embedding_human_beta_df = pd.DataFrame(embedding_human_beta, columns=['UMAP-1', 'UMAP-2'])
+embedding_human_beta_df['antigen.epitope'] = tr_human_beta_color['antigen.epitope']
+
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_human_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+plt.title('UMAP: Data Visualization by Antigen Epitope - Human Beta Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
+
+##alpha+beta chains
+
+# Scale the data
+scaler = StandardScaler()
+tr_human_alpha_beta_scaled = scaler.fit_transform(tr_human_alpha_beta)
+
+# Fit UMAP
+reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
+embedding_human_alpha_beta = reducer.fit_transform(tr_human_alpha_beta_scaled)
+
+# Create a DataFrame for the embedding
+embedding_human_alpha_beta_df = pd.DataFrame(embedding_human_alpha_beta, columns=['UMAP-1', 'UMAP-2'])
+embedding_human_alpha_beta_df['antigen.epitope'] = tr_human_alpha_beta_color['antigen.epitope']
+
+# Plot the UMAP embedding
+plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
+scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+
+# Here we add the legend outside the plot
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+plt.title('UMAP: Data Visualization by Antigen Epitope - Human Alpha+Beta Chains')
+plt.xlabel('UMAP-1')
+plt.ylabel('UMAP-2')
+# Adjust layout to make room for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+plt.show()
 
 
 # Task 5 (the following part of code is finished by Yu Gu).
