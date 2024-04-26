@@ -1,7 +1,7 @@
+# Task 3 (the following part of code is finished by Letian Zhang).
+
 import pandas as pd
 from tcrdist.repertoire import TCRrep
-
-# Task 3 (the following part of code is finished by Letian Zhang).
 
 # read the dataset
 df = pd.read_csv(r"vdjdb.csv", sep = ",", usecols=(0,1,2,3,4,5,9,10,16))
@@ -100,7 +100,6 @@ tr_mouse_alpha_beta_color = tr_mouse.clone_df
 tr_mouse_alpha_beta = tr_mouse.pw_alpha + tr_mouse.pw_beta
 print(tr_mouse_alpha_beta)
 
-
 # compute the distance matrix for the alpha and the beta chains (human)
 tr_human = TCRrep(cell_df = df1,
                   organism = 'human',
@@ -116,9 +115,7 @@ tr_human_alpha_beta_color = tr_human.clone_df
 tr_human_alpha_beta = tr_human.pw_alpha + tr_human.pw_beta
 print(tr_human_alpha_beta)
 
-
 # transfer matrix to csv file
-
 tr_mouse_alpha_beta_df = pd.DataFrame(tr_mouse_alpha_beta)
 tr_mouse_alpha_beta_df.to_csv('tr_mouse_alpha_beta.csv', index = False)
 print("Matrix saved as 'tr_mouse_alpha_beta.csv'")
@@ -128,9 +125,8 @@ tr_human_alpha_beta_df.to_csv('tr_human_alpha_beta.csv', index = False)
 print("Matrix saved as 'tr_human_alpha_beta.csv'")
 
 
+# Task 4 (the following part of code is finished by Uchit Bhadauriya).
 
-
-# Task 4
 
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
@@ -191,26 +187,104 @@ tr_human_beta_color['epitope_codes'] = pd.Categorical(tr_human_beta_color['epito
 tr_human_alpha_beta_color['epitope_codes'] = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
 
 
+# Task 5 (the following part of code is finished by Yu Gu).
 
-# task 6
+
+import pandas as pd
+from sklearn.cluster import DBSCAN
+from sklearn.metrics import silhouette_score
+import matplotlib.pyplot as plt
+from sklearn.manifold import MDS
+
+# Mouse
+
+# Read distance matrix.
+mouse = pd.read_csv('tr_mouse_alpha_beta.csv')
+distance_matrix = mouse.values
+
+# For the distance matrix, we use precomputed as the measure of distance.
+dbscan = DBSCAN(eps = 120, min_samples = 35, metric = "precomputed")
+clusters = dbscan.fit_predict(distance_matrix)
+# print("Mouse Cluster labels:", clusters)
+
+# For visualization, we use the MDS multidimensional scaling technique to reduce the distance matrix to a two-dimensional space.
+mds = MDS(n_components = 2, dissimilarity = "precomputed", random_state = 42)
+mds_transformed = mds.fit_transform(distance_matrix)
+
+# Calculate silhouette coefficients (only calculate non-noisy clustered data).
+valid_clusters = clusters[clusters != -1]
+valid_mds_transformed = mds_transformed[clusters != -1]
+
+if len(set(valid_clusters)) > 1:  # There must be at least 2 clusters to calculate the silhouette coefficient.
+    silhouette = silhouette_score(valid_mds_transformed, valid_clusters)
+    print("The silhouette coefficient of mouse is ", silhouette)
+else:
+    silhouette = -1  
+
+# Visualize clustering results.
+plt.figure(figsize=(10, 8))
+plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c = valid_clusters, cmap='viridis', marker='o', s=50)
+plt.title('DBSCAN Clustering (Silhouette Coefficient: {:.2f})'.format(silhouette))
+plt.xlabel('MDS Dimension 1')
+plt.ylabel('MDS Dimension 2')
+plt.colorbar(label='Cluster Label')
+plt.show()
+
+# Human
+
+# Read distance matrix.
+human = pd.read_csv('tr_human_alpha_beta.csv')
+distance_matrix = human.values
+
+# For the distance matrix, we use precomputed as the measure of distance.
+dbscan = DBSCAN(eps = 120, min_samples = 35, metric = "precomputed")
+clusters = dbscan.fit_predict(distance_matrix)
+# print("Human Cluster labels:", clusters)
+
+# For visualization, we use the MDS multidimensional scaling technique to reduce the distance matrix to a two-dimensional space.
+mds = MDS(n_components = 2, dissimilarity = "precomputed", random_state = 42)
+mds_transformed = mds.fit_transform(distance_matrix)
+
+# Calculate silhouette coefficients (only calculate non-noisy clustered data).
+valid_clusters = clusters[clusters != -1]
+valid_mds_transformed = mds_transformed[clusters != -1]
+
+if len(set(valid_clusters)) > 1:  # There must be at least 2 clusters to calculate the silhouette coefficient.
+    silhouette = silhouette_score(valid_mds_transformed, valid_clusters)
+    print("The silhouette_score of human is ", silhouette)
+else:
+    silhouette = -1  
+
+# Visualize clustering results.
+plt.figure(figsize=(10, 8))
+plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c = valid_clusters, cmap='viridis', marker='o', s=50)
+plt.title('DBSCAN Clustering (Silhouette Coefficient: {:.2f})'.format(silhouette))
+plt.xlabel('MDS Dimension 1')
+plt.ylabel('MDS Dimension 2')
+plt.colorbar(label='Cluster Label')
+plt.show()
+
+
+# Task 6 (the following part of code is finished by Lubin Wan).
+
+
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, recall_score, f1_score, classification_report
 
-# 函数定义：执行网格搜索
+# Function definition: perform grid search.
 def optimize_knn_parameters(X, y):
     knn = KNeighborsClassifier(metric='precomputed', algorithm='brute')
     param_grid = {
-        'n_neighbors': [2, 3, 5, 7, 10, 12, 15], # 不同的邻居数
-        'weights': ['uniform', 'distance'], # 邻居的权重策略
+        'n_neighbors': [2, 3, 5, 7, 10, 12, 15], # Different number of neighbors.
+        'weights': ['uniform', 'distance'], # Neighbor weight strategy.
         }
     grid_search = GridSearchCV(knn, param_grid, cv=4, scoring='accuracy')
     grid_search.fit(X, y)
     return grid_search.best_estimator_, grid_search.best_params_
 
-
-# 函数定义：划分训练和测试数据并执行模型优化
+# Function definition: Split training and test data and perform model optimization.
 def perform_analysis(X, labels):
     indices = np.arange(len(labels))
     train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=1)
@@ -227,7 +301,7 @@ def perform_analysis(X, labels):
     report = classification_report(y_test, y_pred)
     return accuracy, recall, f1, report
 
-# 获取标签数据并执行分析
+# Get label data and perform analysis.
 labels = pd.Categorical(tr_human_alpha_beta_color['epitope']).codes
 accuracy_human, recall_human, f1_human, report_human = perform_analysis(tr_human_alpha_beta, labels)
 print(f'Accuracy-human: {accuracy_human:.2f}')
@@ -241,6 +315,7 @@ print(f'Accuracy-mouse: {accuracy_mouse:.2f}')
 print(f'Recall-mouse: {recall_mouse:.2f}')
 print(f'F1 Score-mouse: {f1_mouse:.2f}')
 print("Classification Report-mouse:\n", report_mouse)
+
 # Process distances and plot with the numeric labels
 process_tcr_distances(tr_human_alpha, tr_human_alpha_color['epitope_codes'], "Human Alpha Chain")
 process_tcr_distances(tr_human_beta, tr_human_beta_color['epitope_codes'], "Human Beta Chain")
