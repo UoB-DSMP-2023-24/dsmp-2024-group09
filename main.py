@@ -128,8 +128,6 @@ print("Matrix saved as 'tr_human_alpha_beta.csv'")
 # Task 4 (the following part of code is finished by Uchit Bhadauriya).
 
 
-#Task4
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 from umap import UMAP
@@ -138,7 +136,7 @@ import pandas as pd
 
 # Mouse
 
-##alpha chains
+## alpha chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -167,8 +165,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-##beta chains
-
+## beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -196,7 +193,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-##alpha+beta chains
+## alpha+beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -226,7 +223,7 @@ plt.show()
 
 #Human
 
-##alpha chains
+## alpha chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -254,7 +251,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-##beta chains
+## beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -282,7 +279,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-##alpha+beta chains
+## alpha+beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -391,6 +388,7 @@ plt.show()
 
 # Task 6 (the following part of code is finished by Lubin Wan).
 
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -473,8 +471,6 @@ tr_human_alpha_beta_scaled = scaler_human.fit_transform(tr_human_alpha_beta)
 
 # Fit the scaler to the mouse data and transform it
 tr_mouse_alpha_beta_scaled = scaler_mouse.fit_transform(tr_mouse_alpha_beta)
-
-
 
 
 # Function to optimize KNN parameters
