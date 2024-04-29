@@ -404,8 +404,8 @@ from sklearn.metrics import confusion_matrix
 tr_mouse_alpha_beta_color = pd.read_csv("tr_mouse_alpha_beta_color.csv")
 tr_human_alpha_beta_color = pd.read_csv("tr_human_alpha_beta_color.csv")
 
-tr_mouse_alpha_beta = pd.read_csv("tr_mouse_alpha_beta.csv").values
-tr_human_alpha_beta = pd.read_csv("tr_human_alpha_beta.csv").values
+tr_mouse_alpha_beta = pd.read_csv("tr_mouse_alpha_beta_2.csv").values
+tr_human_alpha_beta = pd.read_csv("tr_human_alpha_beta_2.csv").values
 
 # Visualize sample counts distribution for human and mouse
 value_counts_human = tr_human_alpha_beta_color['epitope'].value_counts()
