@@ -181,7 +181,7 @@ embedding_beta_df['antigen.epitope'] = tr_mouse_alpha_beta_color['antigen.epitop
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -204,12 +204,12 @@ reducer = UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
 embedding = reducer.fit_transform(tr_mouse_scaled)
 
 # Create a DataFrame for the embedding
-embedding_df = pd.DataFrame(embedding, columns=['UMAP-1', 'UMAP-2'])
-embedding_df['antigen.epitope'] = tr_mouse_alpha_beta_color['antigen.epitope']
+embedding_mouse_alpha_beta_df = pd.DataFrame(embedding, columns=['UMAP-1', 'UMAP-2'])
+embedding_mouse_alpha_beta_df['antigen.epitope'] = tr_mouse_alpha_beta_color['antigen.epitope']
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_mouse_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -295,7 +295,7 @@ embedding_human_alpha_beta_df['antigen.epitope'] = tr_human_alpha_beta_color['an
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_human_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
