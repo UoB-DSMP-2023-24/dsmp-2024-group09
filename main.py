@@ -1,7 +1,18 @@
-# Task 3 (the following part of code is finished by Letian Zhang).
-
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from umap import UMAP
 from tcrdist.repertoire import TCRrep
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import DBSCAN
+from sklearn.metrics import silhouette_score
+from sklearn.manifold import MDS
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+
+# Task 3 (the following part of code is finished by Letian Zhang).
 
 # read the dataset
 df = pd.read_csv(r"vdjdb.csv", sep = ",", usecols=(0,1,2,3,4,5,9,10,16))
@@ -44,7 +55,7 @@ tr_mouse_a = TCRrep(cell_df = df1_alpha,
 tr_mouse_alpha = tr_mouse_a.pw_alpha
 tr_mouse_alpha_color = tr_mouse_a.clone_df
 print(tr_mouse_alpha)
-#print(tr_mouse_a.pw_cdr3_a_aa)
+# print(tr_mouse_a.pw_cdr3_a_aa)
 
 # compute the distance matrix for the alpha chains (human)
 tr_human_a = TCRrep(cell_df = df1_alpha,
@@ -54,7 +65,7 @@ tr_human_a = TCRrep(cell_df = df1_alpha,
 tr_human_alpha = tr_human_a.pw_alpha
 tr_human_alpha_color = tr_human_a.clone_df
 print(tr_human_alpha)
-#print(tr_mouse_a.pw_cdr3_a_aa)
+# print(tr_mouse_a.pw_cdr3_a_aa)
 
 # for all the beta chains
 # compute the distance matrix for the beta chains (mouse)
@@ -65,7 +76,7 @@ tr_mouse_b = TCRrep(cell_df = df1_beta,
 tr_mouse_beta = tr_mouse_b.pw_beta
 tr_mouse_beta_color = tr_mouse_b.clone_df
 print(tr_mouse_beta)
-#print(tr_mouse_b.pw_cdr3_b_aa)
+# print(tr_mouse_b.pw_cdr3_b_aa)
 
 # compute the distance matrix for the beta chains (human)
 tr_human_b = TCRrep(cell_df = df1_beta,
@@ -75,7 +86,7 @@ tr_human_b = TCRrep(cell_df = df1_beta,
 tr_human_beta = tr_human_b.pw_beta
 tr_human_beta_color = tr_human_b.clone_df
 print(tr_human_beta)
-#print(tr_human_b.pw_cdr3_b_aa)
+# print(tr_human_b.pw_cdr3_b_aa)
 
 # remove clone_id = 0
 df1_alpha = df1_alpha[ df1_alpha['clone_id'] != 0]
@@ -91,11 +102,11 @@ tr_mouse = TCRrep(cell_df = df1,
                   chains = ['alpha','beta'],
                   db_file = 'alphabeta_gammadelta_db.tsv')
 tr_mouse_alpha1 = tr_mouse.pw_alpha
-print(tr_mouse_alpha)
+# print(tr_mouse_alpha)
 tr_mouse_beta1 = tr_mouse.pw_beta
-print(tr_mouse_beta)
-#print(tr_mouse.pw_cdr3_a_aa)
-#print(tr_mouse.pw_cdr3_b_aa)
+# print(tr_mouse_beta)
+# print(tr_mouse.pw_cdr3_a_aa)
+# print(tr_mouse.pw_cdr3_b_aa)
 tr_mouse_alpha_beta_color = tr_mouse.clone_df
 tr_mouse_alpha_beta = tr_mouse.pw_alpha + tr_mouse.pw_beta
 print(tr_mouse_alpha_beta)
@@ -106,16 +117,17 @@ tr_human = TCRrep(cell_df = df1,
                   chains = ['alpha','beta'],
                   db_file = 'alphabeta_gammadelta_db.tsv')
 tr_human_alpha1 = tr_human.pw_alpha
-print(tr_human_alpha)
+# print(tr_human_alpha)
 tr_human_beta1 = tr_human.pw_beta
-print(tr_human_beta)
-#print(tr_human.pw_cdr3_a_aa)
-#print(tr_human.pw_cdr3_b_aa)
+# print(tr_human_beta)
+# print(tr_human.pw_cdr3_a_aa)
+# print(tr_human.pw_cdr3_b_aa)
 tr_human_alpha_beta_color = tr_human.clone_df
 tr_human_alpha_beta = tr_human.pw_alpha + tr_human.pw_beta
 print(tr_human_alpha_beta)
 
 # transfer matrix to csv file
+
 tr_mouse_alpha_beta_df = pd.DataFrame(tr_mouse_alpha_beta)
 tr_mouse_alpha_beta_df.to_csv('tr_mouse_alpha_beta.csv', index = False)
 print("Matrix saved as 'tr_mouse_alpha_beta.csv'")
@@ -124,19 +136,19 @@ tr_human_alpha_beta_df = pd.DataFrame(tr_human_alpha_beta)
 tr_human_alpha_beta_df.to_csv('tr_human_alpha_beta.csv', index = False)
 print("Matrix saved as 'tr_human_alpha_beta.csv'")
 
+tr_mouse_alpha_beta_color_df = pd.DataFrame(tr_mouse_alpha_beta_color)
+tr_mouse_alpha_beta_color_df.to_csv('tr_mouse_alpha_beta_color.csv', index = False)
+print("Matrix saved as 'tr_mouse_alpha_beta_color.csv'")
+
+tr_human_alpha_beta_color_df = pd.DataFrame(tr_human_alpha_beta_color)
+tr_human_alpha_beta_color_df.to_csv('tr_human_alpha_beta_color.csv', index = False)
+print("Matrix saved as 'tr_human_alpha_beta_color.csv'")
+
 
 # Task 4 (the following part of code is finished by Uchit Bhadauriya).
 
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-from umap import UMAP
-from sklearn.preprocessing import StandardScaler
-import pandas as pd
-
 # Mouse
-
-## alpha chains
+# alpha chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -165,7 +177,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-## beta chains
+# beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -193,7 +205,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-## alpha+beta chains
+# alpha+beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -209,7 +221,8 @@ embedding_mouse_alpha_beta_df['antigen.epitope'] = tr_mouse_alpha_beta_color['an
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_mouse_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_mouse_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50,
+                               alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -221,9 +234,8 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-#Human
-
-## alpha chains
+# Human
+# alpha chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -239,7 +251,8 @@ embedding_human_alpha_df['antigen.epitope'] = tr_human_alpha_color['antigen.epit
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_human_alpha_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_human_alpha_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50,
+                               alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -251,7 +264,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-## beta chains
+# beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -267,7 +280,8 @@ embedding_human_beta_df['antigen.epitope'] = tr_human_beta_color['antigen.epitop
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_human_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_human_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50,
+                               alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -279,7 +293,7 @@ plt.ylabel('UMAP-2')
 plt.tight_layout(rect=[0, 0, 0.85, 1])
 plt.show()
 
-## alpha+beta chains
+# alpha+beta chains
 
 # Scale the data
 scaler = StandardScaler()
@@ -295,7 +309,8 @@ embedding_human_alpha_beta_df['antigen.epitope'] = tr_human_alpha_beta_color['an
 
 # Plot the UMAP embedding
 plt.figure(figsize=(12, 10))  # Increase figure size to make room for the legend
-scatter_plot = sns.scatterplot(data=embedding_human_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50, alpha=0.6)
+scatter_plot = sns.scatterplot(data=embedding_human_alpha_beta_df, x='UMAP-1', y='UMAP-2', hue='antigen.epitope', s=50,
+                               alpha=0.6)
 
 # Here we add the legend outside the plot
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -310,13 +325,6 @@ plt.show()
 
 # Task 5 (the following part of code is finished by Yu Gu).
 
-
-import pandas as pd
-from sklearn.cluster import DBSCAN
-from sklearn.metrics import silhouette_score
-import matplotlib.pyplot as plt
-from sklearn.manifold import MDS
-
 # Mouse
 
 # Read distance matrix.
@@ -324,12 +332,12 @@ mouse = pd.read_csv('tr_mouse_alpha_beta.csv')
 distance_matrix = mouse.values
 
 # For the distance matrix, we use precomputed as the measure of distance.
-dbscan = DBSCAN(eps = 120, min_samples = 35, metric = "precomputed")
+dbscan = DBSCAN(eps=120, min_samples=35, metric="precomputed")
 clusters = dbscan.fit_predict(distance_matrix)
 # print("Mouse Cluster labels:", clusters)
 
 # For visualization, we use the MDS multidimensional scaling technique to reduce the distance matrix to a two-dimensional space.
-mds = MDS(n_components = 2, dissimilarity = "precomputed", random_state = 42)
+mds = MDS(n_components=2, dissimilarity="precomputed", random_state=42)
 mds_transformed = mds.fit_transform(distance_matrix)
 
 # Calculate silhouette coefficients (only calculate non-noisy clustered data).
@@ -340,11 +348,12 @@ if len(set(valid_clusters)) > 1:  # There must be at least 2 clusters to calcula
     silhouette = silhouette_score(valid_mds_transformed, valid_clusters)
     print("The silhouette coefficient of mouse is ", silhouette)
 else:
-    silhouette = -1  
+    silhouette = -1
 
 # Visualize clustering results.
 plt.figure(figsize=(10, 8))
-plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c = valid_clusters, cmap='viridis', marker='o', s=50)
+plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c=valid_clusters, cmap='viridis', marker='o',
+            s=50)
 plt.title('DBSCAN Clustering (Silhouette Coefficient: {:.2f})'.format(silhouette))
 plt.xlabel('MDS Dimension 1')
 plt.ylabel('MDS Dimension 2')
@@ -358,12 +367,12 @@ human = pd.read_csv('tr_human_alpha_beta.csv')
 distance_matrix = human.values
 
 # For the distance matrix, we use precomputed as the measure of distance.
-dbscan = DBSCAN(eps = 120, min_samples = 35, metric = "precomputed")
+dbscan = DBSCAN(eps=120, min_samples=35, metric="precomputed")
 clusters = dbscan.fit_predict(distance_matrix)
 # print("Human Cluster labels:", clusters)
 
 # For visualization, we use the MDS multidimensional scaling technique to reduce the distance matrix to a two-dimensional space.
-mds = MDS(n_components = 2, dissimilarity = "precomputed", random_state = 42)
+mds = MDS(n_components=2, dissimilarity="precomputed", random_state=42)
 mds_transformed = mds.fit_transform(distance_matrix)
 
 # Calculate silhouette coefficients (only calculate non-noisy clustered data).
@@ -374,11 +383,12 @@ if len(set(valid_clusters)) > 1:  # There must be at least 2 clusters to calcula
     silhouette = silhouette_score(valid_mds_transformed, valid_clusters)
     print("The silhouette_score of human is ", silhouette)
 else:
-    silhouette = -1  
+    silhouette = -1
 
 # Visualize clustering results.
 plt.figure(figsize=(10, 8))
-plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c = valid_clusters, cmap='viridis', marker='o', s=50)
+plt.scatter(valid_mds_transformed[:, 0], valid_mds_transformed[:, 1], c=valid_clusters, cmap='viridis', marker='o',
+            s=50)
 plt.title('DBSCAN Clustering (Silhouette Coefficient: {:.2f})'.format(silhouette))
 plt.xlabel('MDS Dimension 1')
 plt.ylabel('MDS Dimension 2')
@@ -388,24 +398,12 @@ plt.show()
 
 # Task 6 (the following part of code is finished by Lubin Wan).
 
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import confusion_matrix
-
 # Read data
 tr_mouse_alpha_beta_color = pd.read_csv("tr_mouse_alpha_beta_color.csv")
 tr_human_alpha_beta_color = pd.read_csv("tr_human_alpha_beta_color.csv")
 
-tr_mouse_alpha_beta = pd.read_csv("tr_mouse_alpha_beta_2.csv").values
-tr_human_alpha_beta = pd.read_csv("tr_human_alpha_beta_2.csv").values
+tr_mouse_alpha_beta = pd.read_csv("tr_mouse_alpha_beta.csv").values
+tr_human_alpha_beta = pd.read_csv("tr_human_alpha_beta.csv").values
 
 # Visualize sample counts distribution for human and mouse
 value_counts_human = tr_human_alpha_beta_color['epitope'].value_counts()
@@ -443,12 +441,12 @@ percentiles = [0.50, 0.75, 0.90, 0.95]
 print("\nHuman Data Percentiles:")
 for p in percentiles:
     percentile_value = value_counts_human.quantile(p)
-    print(f"{p*100}% of the categories have at least {percentile_value} samples.")
+    print(f"{p * 100}% of the categories have at least {percentile_value} samples.")
 
 print("\nMouse Data Percentiles:")
 for p in percentiles:
     percentile_value = value_counts_mouse.quantile(p)
-    print(f"{p*100}% of the categories have at least {percentile_value} samples.")
+    print(f"{p * 100}% of the categories have at least {percentile_value} samples.")
 
 # Filter categories with less than a certain number of samples
 valid_categories_mouse = value_counts_mouse[value_counts_mouse >= 40].index
@@ -472,12 +470,11 @@ tr_human_alpha_beta_scaled = scaler_human.fit_transform(tr_human_alpha_beta)
 # Fit the scaler to the mouse data and transform it
 tr_mouse_alpha_beta_scaled = scaler_mouse.fit_transform(tr_mouse_alpha_beta)
 
-
 # Function to optimize KNN parameters
 def optimize_knn_parameters(X, y):
     knn = KNeighborsClassifier(metric='precomputed', algorithm='brute')
     param_grid = {
-        'n_neighbors': [ 3, 5, 7, 9,11 ],
+        'n_neighbors': [3, 5, 7, 9, 11],
         'weights': ['uniform', 'distance'],
         'p': [1, 2, 3]
     }
@@ -496,9 +493,9 @@ def perform_analysis(X, labels, title):
     y_test = labels[test_indices]
     best_knn, best_params = optimize_knn_parameters(X_train, y_train)
     print(f'Best parameters for {title}: {best_params}')
-    
+
     y_pred = best_knn.predict(X_test)
-    
+
     # Calculate metrics
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
@@ -526,8 +523,6 @@ def perform_analysis(X, labels, title):
 
     # Return the metrics
     return accuracy, precision, recall, f1
-
-# ...
 
 # Call perform_analysis for human and mouse data
 results_human = perform_analysis(X_human_filtered, labels_human, "Human")
